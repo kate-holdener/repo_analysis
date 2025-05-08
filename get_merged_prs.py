@@ -32,13 +32,15 @@ def get_merged_prs(repo_owner, repo_name):
         prs = response.json()
         
         for pr in prs:
+            created_at = pr.get("created_at")
             merged_at = pr.get("merged_at")
             if merged_at:  # Check if the PR was merged
                 user = pr["user"]["login"]
                 pr_number = pr["number"]
                 prs_by_user.setdefault(user, []).append({
                                     "number": pr_number,
-                                    "merged_at": merged_at
+                                    "merged_at": merged_at,
+                                    "created_at": created_at
                 })
         # Pagination: Get the 'next' link from the response headers
         url = response.links.get("next", {}).get("url")
@@ -61,7 +63,7 @@ def main():
     for user, prs in prs_by_user.items():
         print(f"Developer: {user}")
         for pr in prs:
-            print(f"  PR #{pr['number']} merged on {pr['merged_at']}")
+            print(f"  PR #{pr['number']} created on {pr['created_at']}, merged on {pr['merged_at']}")
 
 if __name__ == "__main__":
     main()
